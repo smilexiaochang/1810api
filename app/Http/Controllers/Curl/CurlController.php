@@ -362,7 +362,7 @@ class CurlController extends Controller
         $str = rtrim($str0,'&');
         $private_key = openssl_get_privatekey("file://".public_path('keys/private.pem'));
         //dump($private_key);
-        //echo $str;die;
+//        echo $str;die;
         openssl_sign($str,$signature,$private_key,OPENSSL_ALGO_SHA256);
 
         $data['sign'] = base64_encode($signature);
