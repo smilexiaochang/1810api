@@ -349,11 +349,35 @@ class CurlController extends Controller
             'method' => 'alipay.trade.wap.pay',
             'charset' => 'utf-8',
             'sign_type' => 'RSA2',
-            'sign' => '',
             'timestamp' => date('Y-m-d H:i:s'),
             'version' => '1.0',
-            'biz_content' => base64_encode($biz_content)
+            'biz_content' => json_encode($biz_content)
         ];
+
+        ksort($data);
+        $str0 = "";
+        foreach ($data as $k=>$v){
+            $str0 .= $k .'='. $v.'&';
+        }
+        $str = rtrim($str0,'&');
+        $private_key = openssl_get_privatekey("file://".public_path('keys/private.pem'));
+        //dump($private_key);
+        //echo $str;die;
+        openssl_sign($str,$signature,$private_key,OPENSSL_ALGO_SHA256);
+
+        $data['sign'] = base64_encode($signature);
+        //dd($data);
+        // 4 urlencode
+        $param_str = '?';
+        foreach($data as $k=>$v){
+            $param_str .= $k.'='.urlencode($v) . '&';
+        }
+        //dd($param_str);
+        $param = rtrim($param_str,'&');
+        $url = $alipay_gateway . $param;
+        //发送GET请求
+        header("Location:".$url);
+
     }
 
 }
